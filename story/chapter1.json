@@ -1,0 +1,55 @@
+{
+  "start": {
+    "title": "The Fork in the Road",
+    "chapter": "Chapter One · The Awakening",
+    "text": "You awaken beneath towering pines, with no memory of how you arrived. Mist curls around your boots. Ahead, the path splits: a lantern glows to the left, while a low growl echoes from the right.",
+    "choices": [
+      {"text": "Follow the lantern toward a cabin", "next": "cabin"},
+      {"text": "Investigate the growl near the cave", "next": "cave"}
+    ]
+  },
+  "cabin": {
+    "title": "The Abandoned Cabin",
+    "chapter": "Chapter One · The Cabin",
+    "text": "The cabin door swings open at your touch. A brass key rests on a dusty table, beside a letter addressed to you. Somewhere upstairs, a floorboard creaks.",
+    "choices": [
+      {"text": "Read the mysterious letter", "next": "letter"},
+      {"text": "Climb the stairs", "next": "stairs"},
+      {"text": "Return to the forest", "next": "start"}
+    ]
+  },
+  "cave": {
+    "title": "The Echoing Cave",
+    "chapter": "Chapter One · The Cave",
+    "text": "Inside the cave, the growl fades. A small wolf is trapped beneath a fallen branch. Beyond it, an eerie blue light pulses deep in the darkness.",
+    "choices": [
+      {"text": "Help the trapped wolf", "next": "wolf"},
+      {"text": "Follow the blue light", "next": "crystal"},
+      {"text": "Return to the forest", "next": "start"}
+    ]
+  },
+  "letter": {
+    "title": "A Warning from Yourself",
+    "chapter": "Ending · The Message",
+    "text": "The letter is written in your own handwriting: 'Do not trust the light.' As you finish reading, you remember everything. You came here to stop something from waking. For now, you have survived—but the mystery remains.",
+    "choices": [{"text": "Begin a new adventure", "next": "start"}]
+  },
+  "stairs": {
+    "title": "The Watcher Upstairs",
+    "chapter": "Ending · The Watcher",
+    "text": "At the top of the stairs, you find a mirror. Your reflection smiles before you do. The cabin doors slam shut, and the forest falls silent. Your adventure ends here.",
+    "choices": [{"text": "Try another path", "next": "start"}]
+  },
+  "wolf": {
+    "title": "A Loyal Companion",
+    "chapter": "Ending · The Guardian",
+    "text": "You lift the branch and free the wolf. It leads you through a hidden passage to the edge of the forest. At dawn, you reach safety, and your new companion disappears into the trees.",
+    "choices": [{"text": "Explore a different path", "next": "start"}]
+  },
+  "crystal": {
+    "title": "The Heart of the Forest",
+    "chapter": "Ending · The Crystal",
+    "text": "You touch the glowing crystal. The entire cave shudders, and the forest outside begins to bloom. You have awakened an ancient power. Whether that was wise is a story for another day.",
+    "choices": [{"text": "Play again", "next": "start"}]
+  }
+}
