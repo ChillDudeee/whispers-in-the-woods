@@ -13,7 +13,7 @@
     <header class="topbar"><div><p class="eyebrow">An interactive adventure</p><h1 id="game-title">Whispers in the Woods</h1></div><button id="restart" type="button" class="restart" hidden>Restart</button></header>
     <section id="lobby" class="lobby" aria-label="Game modes">
       <h2>Choose your adventure</h2>
-      <p>Explore on your own, or invite friends to vote on the same story.</p>
+      <p>Explore on your own, or invite friends to vote while the host chooses the path.</p>
       <button id="single" class="choice" type="button">Play solo</button>
       <div class="lobby-grid">
         <div><h3>Create a multiplayer room</h3><label for="player-name">Your name</label><input id="player-name" maxlength="24" placeholder="Adventurer" /><button id="create" class="choice" type="button">Create room</button></div>
@@ -25,6 +25,7 @@
       <div><strong>Room: <span id="code-display"></span></strong> <button id="copy-code" type="button">Copy code</button><p id="room-status" aria-live="polite"></p></div>
       <div><strong>Players</strong><ul id="player-list"></ul><button id="leave" type="button">Leave room</button></div>
     </section>
+    <section id="vote-panel" class="vote-panel" hidden><h2>Player votes</h2><p id="vote-summary" aria-live="polite"></p><ul id="vote-list"></ul><p id="host-hint" hidden>As host, choose a story option to advance everyone.</p></section>
     <section id="scene" class="scene" aria-label="Current story scene" hidden>
       <div class="scene-overlay"><p id="scene-label" class="scene-label">Chapter One</p><div class="story-panel"><h2 id="scene-title">Loading…</h2><p id="story-text" aria-live="polite">Preparing your adventure.</p><div id="choices" class="choices"></div><p id="error" role="alert" class="error" hidden></p></div></div>
     </section>

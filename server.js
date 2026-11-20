@@ -14,7 +14,7 @@ const rooms = new Map();
 const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const code = () => Array.from({length: 5}, () => alphabet[randomInt(alphabet.length)]).join('');
 const safeName = value => typeof value === 'string' ? value.trim().slice(0, 24) : '';
-const roomView = room => ({code: room.code, sceneId: room.sceneId, scene: story[room.sceneId], hostId: room.hostId, players: [...room.players].map(([id, p]) => ({id, name:p.name, voted:room.votes.has(id)})), votes: room.votes.size});
+const roomView = room => ({code: room.code, sceneId: room.sceneId, scene: story[room.sceneId], hostId: room.hostId, players: [...room.players].map(([id, p]) => ({id, name:p.name, voted:room.votes.has(id), choiceIndex:room.votes.get(id) ?? null})), votes: room.votes.size, tallies: (story[room.sceneId].choices || []).map((_, i) => [...room.votes.values()].filter(v => v === i).length)});
 const publish = room => io.to(room.code).emit('room:update', roomView(room));
 const failure = (ack, message) => { if (typeof ack === 'function') ack({ok:false, error:message}); };
 function leave(socket) {
@@ -27,21 +27,8 @@ function leave(socket) {
   if (room.players.size === 0) rooms.delete(room.code);
   else {
     if (room.hostId === socket.id) room.hostId = room.players.keys().next().value;
-    resolveIfReady(room);
     if (rooms.has(room.code)) publish(room);
   }
-}
-function resolveIfReady(room) {
-  if (!room.players.size || room.votes.size !== room.players.size) return;
-  const scene = story[room.sceneId];
-  const counts = (scene.choices || []).map((_, i) => [...room.votes.values()].filter(v => v === i).length);
-  // A tied vote is resolved by the first tied choice in story order.
-  const winner = counts.indexOf(Math.max(...counts));
-  if (winner < 0 || !scene.choices[winner] || !story[scene.choices[winner].next]) return;
-  const winningText = scene.choices[winner].text;
-  room.sceneId = scene.choices[winner].next;
-  room.votes.clear();
-  io.to(room.code).emit('room:result', {choice:winningText});
 }
 io.on('connection', socket => {
   socket.on('room:create', (name, ack) => {
@@ -81,10 +68,22 @@ io.on('connection', socket => {
     if (!room || !room.players.has(socket.id)) return failure(ack, 'Join a room first.');
     const choices = story[room.sceneId].choices || [];
     if (!Number.isInteger(index) || index < 0 || index >= choices.length) return failure(ack, 'Invalid choice.');
-    if (room.votes.has(socket.id)) return failure(ack, 'You already voted this round.');
+    if (room.hostId === socket.id) return failure(ack, 'The host selects the final choice instead of voting.');
     room.votes.set(socket.id, index);
     ack?.({ok:true});
-    resolveIfReady(room);
+    publish(room);
+  });
+  socket.on('room:decide', (index, ack) => {
+    const room = rooms.get(socket.data.roomCode);
+    if (!room || room.hostId !== socket.id) return failure(ack, 'Only the room host can decide.');
+    const choices = story[room.sceneId].choices || [];
+    if (!Number.isInteger(index) || index < 0 || index >= choices.length) return failure(ack, 'Invalid choice.');
+    const choice = choices[index];
+    if (!story[choice.next]) return failure(ack, 'The next scene is missing.');
+    room.sceneId = choice.next;
+    room.votes.clear();
+    ack?.({ok:true});
+    io.to(room.code).emit('room:result', {choice:choice.text});
     publish(room);
   });
   socket.on('room:restart', (_, ack) => {

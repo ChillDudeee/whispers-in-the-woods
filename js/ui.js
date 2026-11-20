@@ -10,7 +10,7 @@ export function renderScene(scene, onChoice, options = {}) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'choice';
-    button.textContent = choice.text;
+    button.textContent = (options.buttonPrefix || '') + choice.text;
     button.disabled = !!options.disabled;
     button.addEventListener('click', () => onChoice(options.choiceIndex ? index : choice.next));
     container.appendChild(button);

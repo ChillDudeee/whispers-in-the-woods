@@ -34,3 +34,8 @@ Running on `localhost` **does not** make the game publicly accessible. Deploy th
 ## Scope and limitations
 
 This is a starter prototype, not a production-hardened public service. No accounts, saved games, chat, moderation, rate limiting, persistent rooms, or cross-server scaling. Player names are display-only and not authenticated. Use a single Node server instance for shared room state. Add input/rate limits, monitoring, persistence, and abuse controls before broad public launch.
+
+## Host-decides voting (updated)
+Guests vote for one option per scene. All players can see each guest's selected option and live totals. The host does not vote: their choice buttons say **Decide**, and selecting one advances everyone immediately, regardless of the vote totals. Votes reset for the next scene. If the host disconnects, the next connected player becomes host.
+
+To update an existing Render deployment, replace the source files in your GitHub repository with the contents of this folder, commit the changes, and wait for Render to deploy. Do not upload `node_modules`.

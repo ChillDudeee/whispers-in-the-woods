@@ -9,6 +9,7 @@ function displayMode(mode) {
   $('#lobby').hidden = mode !== 'lobby';
   $('#scene').hidden = mode === 'lobby';
   $('#multiplayer-bar').hidden = mode !== 'multi';
+  $('#vote-panel').hidden = mode !== 'multi';
   $('#restart').hidden = mode === 'lobby' || (mode === 'multi' && currentRoom?.hostId !== myId);
   $('#error').hidden = true;
 }
@@ -40,9 +41,26 @@ function connect() {
       item.textContent = `${player.name}${player.id === room.hostId ? ' (host)' : ''}${player.voted ? ' ✓' : ''}`;
       list.appendChild(item);
     }
-    const voted = room.players.find(p => p.id === myId)?.voted;
-    $('#room-status').textContent = `${room.votes}/${room.players.length} votes received${voted ? ' · Waiting for other players' : ' · Choose an option'}`;
-    renderScene(room.scene, index => send('room:vote', index).catch(showError), {choiceIndex:true, disabled:!!voted});
+    const isHost = room.hostId === myId;
+    const myVote = room.players.find(p => p.id === myId)?.choiceIndex;
+    const choices = room.scene.choices || [];
+    $('#room-status').textContent = `${room.votes}/${Math.max(0,room.players.length - 1)} guest votes received · ${isHost ? 'You make the final decision' : 'Waiting for host decision'}`;
+    $('#vote-summary').textContent = choices.map((c, i) => `${c.text}: ${room.tallies[i] || 0}`).join(' | ') || 'No choices in this scene.';
+    const voteList = $('#vote-list');
+    voteList.replaceChildren();
+    for (const player of room.players) {
+      const item = document.createElement('li');
+      item.textContent = player.id === room.hostId
+        ? `${player.name} (host — final decision)`
+        : `${player.name}: ${player.choiceIndex === null ? 'Not voted yet' : (choices[player.choiceIndex]?.text || 'Unknown choice')}`;
+      voteList.appendChild(item);
+    }
+    $('#host-hint').hidden = !isHost || !choices.length;
+    renderScene(room.scene, index => send(isHost ? 'room:decide' : 'room:vote', index).catch(showError), {
+      choiceIndex:true,
+      disabled:!isHost && myVote !== null && myVote !== undefined,
+      buttonPrefix: isHost ? 'Decide: ' : 'Vote: '
+    });
   });
   socket.on('room:result', result => {$('#room-status').textContent = `The group chose: ${result.choice}`;});
   socket.on('disconnect', () => { if (currentMode === 'multi') showError('Connection lost. Return to the lobby and join a new room if needed.'); });
