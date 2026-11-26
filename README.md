@@ -36,3 +36,14 @@ Health now appears as a 0-100 progress bar (green, amber at 50 or below, red at 
 - For Render: commit the **contents** of `CYOA-Game` to your repository root; build command `npm install`, start command `npm start`. Check Render logs and `/health` after deployment. Test a solo save export/import and a two-browser multiplayer room.
 - Multiplayer rooms remain **in-memory only**. Server restarts, redeployments, or sleeping free hosting instances erase multiplayer rooms and shared progress. Solo autosaves stay on the same browser; portable JSON saves are manually transferable.
 - The tests are automated logic checks, not a substitute for testing two real browsers and mobile layouts. The server has no user authentication or persistent multiplayer database.
+
+## Phase 5: multiplayer persistence and reconnecting
+
+- Rooms now use stable, random player session tokens stored in each player's browser. Refreshing or reconnecting resumes the same identity, including the host role. Use **Resume previous multiplayer room** after reopening the site.
+- Offline players remain listed in the room, and the host may transfer ownership to another member using **Transfer host**. The host still has final control over story choices; guests' votes remain visible in the poll.
+- For persistence across Render restarts, set `DATABASE_URL` to a PostgreSQL connection string in Render's **Environment** settings. The server creates a `cyoa_rooms` table on startup. Without this variable, rooms work but remain memory-only.
+- Use a managed PostgreSQL service with a persistent database. Render's free web service alone does not provide persistent storage. Database plans and retention policies vary; check your provider's pricing.
+- If your database requires a custom CA certificate, configure the Node.js trust store appropriately. For a local non-TLS Postgres instance only, set `PGSSL=disable`. Do not disable certificate verification for public production databases.
+- Room data includes names, player tokens, votes, and game progress. Treat the database URL as a secret and never commit it to GitHub. Possession of a player's browser token grants control of that player, so do not share browser storage or tokens.
+- Rooms persist until all members explicitly leave. Offline members still occupy room slots; an administrator may need to remove abandoned rooms from the database. This version assumes **one running server instance**; do not scale Render to multiple instances without shared Socket.IO coordination and synchronized room updates.
+- Install dependencies using `npm install` and run `npm test`, then `npm start`. Render build command: `npm install`; start command: `npm start`.

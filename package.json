@@ -1,6 +1,6 @@
 {
   "name": "whispers-in-the-woods",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "express": "^4.21.2",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "pg": "^8.13.1"
   },
   "engines": {
     "node": ">=20"

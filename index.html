@@ -14,7 +14,7 @@
     <section id="lobby" class="lobby" aria-label="Game modes">
       <h2>Choose your adventure</h2>
       <p>Explore on your own, or invite friends to vote while the host chooses the path.</p>
-      <button id="single" class="choice" type="button">Play solo</button>
+      <button id="single" class="choice" type="button">Play solo</button><button id="resume-room" class="choice" type="button" hidden>Resume previous multiplayer room</button>
       <div class="lobby-grid">
         <div><h3>Create a multiplayer room</h3><label for="player-name">Your name</label><input id="player-name" maxlength="24" placeholder="Adventurer" /><button id="create" class="choice" type="button">Create room</button></div>
         <div><h3>Join a friend's room</h3><label for="room-code">Room code</label><input id="room-code" maxlength="5" placeholder="ABCDE" autocapitalize="characters" /><button id="join" class="choice" type="button">Join room</button></div>
@@ -23,7 +23,7 @@
     </section>
     <section id="multiplayer-bar" class="multiplayer-bar" hidden>
       <div><strong>Room: <span id="code-display"></span></strong> <button id="copy-code" type="button">Copy code</button><p id="room-status" aria-live="polite"></p></div>
-      <div><strong>Players</strong><ul id="player-list"></ul><button id="leave" type="button">Leave room</button></div>
+      <div><strong>Players</strong><ul id="player-list"></ul><div class="host-controls"><label for="host-transfer">Transfer host to</label><select id="host-transfer" hidden></select><button id="transfer-host" type="button" hidden>Transfer host</button></div><button id="leave" type="button">Leave room</button></div>
     </section>
     <section id="vote-panel" class="vote-panel" hidden><h2>Player votes</h2><p id="vote-summary" aria-live="polite"></p><div id="poll-results" class="poll-results" aria-label="Live poll results"></div><h3 class="vote-subheading">Who voted for what</h3><ul id="vote-list"></ul><p id="host-hint" hidden>As host, choose a story option to advance everyone.</p></section>
     <section id="solo-save-tools" class="save-tools" hidden aria-label="Solo save tools"><button id="export-save" type="button">Export save</button><label class="import-label" for="import-save">Import save</label><input id="import-save" type="file" accept=".json,application/json" /><span id="import-message" role="status"></span></section>
