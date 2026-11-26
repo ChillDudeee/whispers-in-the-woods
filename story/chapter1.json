@@ -4,52 +4,189 @@
     "chapter": "Chapter One · The Awakening",
     "text": "You awaken beneath towering pines, with no memory of how you arrived. Mist curls around your boots. Ahead, the path splits: a lantern glows to the left, while a low growl echoes from the right.",
     "choices": [
-      {"text": "Follow the lantern toward a cabin", "next": "cabin"},
-      {"text": "Investigate the growl near the cave", "next": "cave"}
-    ]
+      {
+        "text": "Follow the lantern toward a cabin",
+        "next": "cabin"
+      },
+      {
+        "text": "Investigate the growl near the cave",
+        "next": "cave",
+        "effects": {
+          "health": -5
+        }
+      }
+    ],
+    "background": "forest"
   },
   "cabin": {
     "title": "The Abandoned Cabin",
     "chapter": "Chapter One · The Cabin",
     "text": "The cabin door swings open at your touch. A brass key rests on a dusty table, beside a letter addressed to you. Somewhere upstairs, a floorboard creaks.",
     "choices": [
-      {"text": "Read the mysterious letter", "next": "letter"},
-      {"text": "Climb the stairs", "next": "stairs"},
-      {"text": "Return to the forest", "next": "start"}
-    ]
+      {
+        "text": "Take the brass key (+ key)",
+        "next": "cabin",
+        "requires": {
+          "notItems": [
+            "brass_key"
+          ]
+        },
+        "effects": {
+          "addItems": [
+            "brass_key"
+          ],
+          "setFlags": {
+            "found_key": true
+          }
+        }
+      },
+      {
+        "text": "Read the mysterious letter",
+        "next": "letter"
+      },
+      {
+        "text": "Climb the stairs",
+        "next": "stairs"
+      },
+      {
+        "text": "Return to the forest",
+        "next": "start"
+      },
+      {
+        "text": "Unlock the cellar door (requires key)",
+        "next": "cellar",
+        "requires": {
+          "items": [
+            "brass_key"
+          ]
+        },
+        "effects": {
+          "removeItems": [
+            "brass_key"
+          ],
+          "setFlags": {
+            "opened_cellar": true
+          }
+        }
+      }
+    ],
+    "background": "cabin"
   },
   "cave": {
     "title": "The Echoing Cave",
     "chapter": "Chapter One · The Cave",
     "text": "Inside the cave, the growl fades. A small wolf is trapped beneath a fallen branch. Beyond it, an eerie blue light pulses deep in the darkness.",
     "choices": [
-      {"text": "Help the trapped wolf", "next": "wolf"},
-      {"text": "Follow the blue light", "next": "crystal"},
-      {"text": "Return to the forest", "next": "start"}
-    ]
+      {
+        "text": "Help the trapped wolf",
+        "next": "wolf",
+        "effects": {
+          "health": 10,
+          "setFlags": {
+            "helped_wolf": true
+          }
+        }
+      },
+      {
+        "text": "Follow the blue light",
+        "next": "crystal",
+        "effects": {
+          "health": -20,
+          "setFlags": {
+            "touched_crystal": true
+          }
+        }
+      },
+      {
+        "text": "Return to the forest",
+        "next": "start"
+      }
+    ],
+    "background": "cave"
   },
   "letter": {
     "title": "A Warning from Yourself",
     "chapter": "Ending · The Message",
     "text": "The letter is written in your own handwriting: 'Do not trust the light.' As you finish reading, you remember everything. You came here to stop something from waking. For now, you have survived—but the mystery remains.",
-    "choices": [{"text": "Begin a new adventure", "next": "start"}]
+    "choices": [
+      {
+        "text": "Begin a new adventure",
+        "next": "start"
+      }
+    ],
+    "background": "cabin"
   },
   "stairs": {
     "title": "The Watcher Upstairs",
     "chapter": "Ending · The Watcher",
     "text": "At the top of the stairs, you find a mirror. Your reflection smiles before you do. The cabin doors slam shut, and the forest falls silent. Your adventure ends here.",
-    "choices": [{"text": "Try another path", "next": "start"}]
+    "choices": [
+      {
+        "text": "Try another path",
+        "next": "start"
+      }
+    ],
+    "background": "cabin"
   },
   "wolf": {
     "title": "A Loyal Companion",
     "chapter": "Ending · The Guardian",
     "text": "You lift the branch and free the wolf. It leads you through a hidden passage to the edge of the forest. At dawn, you reach safety, and your new companion disappears into the trees.",
-    "choices": [{"text": "Explore a different path", "next": "start"}]
+    "choices": [
+      {
+        "text": "Explore a different path",
+        "next": "start"
+      }
+    ],
+    "background": "cave",
+    "portrait": "wolf"
   },
   "crystal": {
     "title": "The Heart of the Forest",
     "chapter": "Ending · The Crystal",
     "text": "You touch the glowing crystal. The entire cave shudders, and the forest outside begins to bloom. You have awakened an ancient power. Whether that was wise is a story for another day.",
-    "choices": [{"text": "Play again", "next": "start"}]
+    "choices": [
+      {
+        "text": "Play again",
+        "next": "start"
+      }
+    ],
+    "background": "forest"
+  },
+  "cellar": {
+    "title": "The Hidden Cellar",
+    "chapter": "Chapter One · Below the Cabin",
+    "text": "Your brass key turns in the cellar lock. Behind the door, a lantern burns beside an ancient map. You have found a safer way through the forest.",
+    "choices": [
+      {
+        "text": "Take the map and return to the forest",
+        "next": "start",
+        "effects": {
+          "addItems": [
+            "forest_map"
+          ],
+          "setFlags": {
+            "found_map": true
+          }
+        }
+      },
+      {
+        "text": "Stay in the cellar",
+        "next": "cellar_end"
+      }
+    ],
+    "background": "cellar"
+  },
+  "cellar_end": {
+    "title": "A Safe Refuge",
+    "chapter": "Ending · The Cellar",
+    "text": "You wait until dawn in the hidden cellar. The forest grows quiet, and you emerge with a new understanding of its secrets.",
+    "choices": [
+      {
+        "text": "Begin again",
+        "next": "start"
+      }
+    ],
+    "background": "cellar"
   }
 }

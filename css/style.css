@@ -7,3 +7,46 @@
 .vote-panel ul { margin: .5rem 0; padding-left: 1.5rem; }
 .vote-panel li { margin: .3rem 0; }
 #host-hint { font-weight: 700; }
+
+.stats-panel{display:flex;flex-wrap:wrap;gap:12px 24px;padding:17px 22px;margin:14px 0;background:#16342c;border:1px solid #62766a;border-radius:12px;font:15px system-ui,sans-serif}.stats-panel span{overflow-wrap:anywhere}.save-status{color:#cbd9cd;font:13px system-ui,sans-serif}.stats-panel[hidden],.save-status[hidden]{display:none!important}
+
+/* Phase 2 visual status widgets */
+.health-widget{flex:1 1 220px;max-width:360px;min-width:180px}
+.health-heading,.poll-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:9px}
+.health-heading strong{font-size:14px}
+.health-track,.poll-track{height:17px;background:#081b19;border:1px solid #82988b;border-radius:999px;overflow:hidden}
+.health-fill{width:100%;height:100%;background:linear-gradient(90deg,#24875b,#69d9a2);border-radius:inherit;transition:width .35s ease,background .35s ease}
+.health-track[data-level="low"] .health-fill{background:linear-gradient(90deg,#aa6a19,#efb64c)}
+.health-track[data-level="critical"] .health-fill{background:linear-gradient(90deg,#a63736,#f26e61)}
+.poll-results{display:grid;gap:16px;margin:18px 0 22px}
+.poll-option{padding:14px 16px;background:#1b3731;border:1px solid #536e61;border-radius:10px}
+.poll-heading{font:14px/1.4 system-ui,sans-serif}
+.poll-heading span{flex:1;overflow-wrap:anywhere}
+.poll-heading strong{white-space:nowrap;color:#e9dcae}
+.poll-track{height:13px;border-color:#5c786b}
+.poll-fill{height:100%;background:linear-gradient(90deg,#398d81,#8dd6bf);border-radius:inherit;transition:width .3s ease}
+.vote-subheading{font:600 15px system-ui,sans-serif;margin:10px 0}
+@media(max-width:500px){.poll-heading{align-items:flex-start;flex-direction:column;gap:4px}.health-widget{max-width:none}}
+@media(prefers-reduced-motion:reduce){.health-fill,.poll-fill{transition:none}}
+
+/* Phase 3: illustrated scenes, portraits, transitions, and sound control */
+.header-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.scene{background-position:center;background-size:cover;background-repeat:no-repeat;isolation:isolate}
+.scene-enter .story-panel{animation:panel-arrive .42s ease-out both}
+.character-portrait{position:absolute;right:clamp(12px,5vw,70px);top:12%;width:clamp(115px,24vw,260px);height:auto;max-height:40%;object-fit:contain;filter:drop-shadow(0 12px 18px #000a);pointer-events:none;opacity:.85}
+.scene-overlay{position:relative;z-index:1}
+.story-panel{backdrop-filter:blur(5px)}
+@keyframes panel-arrive{from{opacity:.35;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.header-actions{justify-content:flex-end}.character-portrait{top:11%;right:10px;width:115px;opacity:.65}.topbar{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){.scene-enter .story-panel{animation:none}}
+
+/* Phase 4: portable solo saves */
+.save-tools{display:flex;flex-wrap:wrap;align-items:center;gap:.65rem;margin:.8rem 0;padding:.8rem;border:1px solid rgba(255,255,255,.18);border-radius:12px}
+.save-tools[hidden]{display:none}
+.save-tools button,.import-label{font:inherit;cursor:pointer;background:#234f48;color:#fff;border:1px solid #83a79c;border-radius:8px;padding:.55rem .8rem}
+.save-tools input[type=file]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.save-tools input[type=file]:focus-visible + span{outline:2px solid white}
+#import-message{font-size:.9rem}
+
+.host-controls {display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:.6rem 0}
+.host-controls select {background:#172a2b;color:#fff;border:1px solid #82999a;border-radius:.4rem;padding:.45rem;max-width:100%}
