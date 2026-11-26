@@ -10,7 +10,7 @@
 </head>
 <body>
   <main class="game" aria-labelledby="game-title">
-    <header class="topbar"><div><p class="eyebrow">An interactive adventure</p><h1 id="game-title">Whispers in the Woods</h1></div><button id="restart" type="button" class="restart" hidden>Restart</button></header>
+    <header class="topbar"><div><p class="eyebrow">An interactive adventure</p><h1 id="game-title">Whispers in the Woods</h1></div><div class="header-actions"><button id="sound-toggle" type="button" class="restart" aria-pressed="false">Sound: Off</button><button id="restart" type="button" class="restart" hidden>Restart</button></div></header>
     <section id="lobby" class="lobby" aria-label="Game modes">
       <h2>Choose your adventure</h2>
       <p>Explore on your own, or invite friends to vote while the host chooses the path.</p>
@@ -25,9 +25,11 @@
       <div><strong>Room: <span id="code-display"></span></strong> <button id="copy-code" type="button">Copy code</button><p id="room-status" aria-live="polite"></p></div>
       <div><strong>Players</strong><ul id="player-list"></ul><button id="leave" type="button">Leave room</button></div>
     </section>
-    <section id="vote-panel" class="vote-panel" hidden><h2>Player votes</h2><p id="vote-summary" aria-live="polite"></p><ul id="vote-list"></ul><p id="host-hint" hidden>As host, choose a story option to advance everyone.</p></section>
+    <section id="vote-panel" class="vote-panel" hidden><h2>Player votes</h2><p id="vote-summary" aria-live="polite"></p><div id="poll-results" class="poll-results" aria-label="Live poll results"></div><h3 class="vote-subheading">Who voted for what</h3><ul id="vote-list"></ul><p id="host-hint" hidden>As host, choose a story option to advance everyone.</p></section>
+    <section id="solo-save-tools" class="save-tools" hidden aria-label="Solo save tools"><button id="export-save" type="button">Export save</button><label class="import-label" for="import-save">Import save</label><input id="import-save" type="file" accept=".json,application/json" /><span id="import-message" role="status"></span></section>
+    <section id="stats-panel" class="stats-panel" hidden aria-label="Adventure status"><div class="health-widget"><div class="health-heading"><strong>Health</strong><strong><span id="health">100</span>/100</strong></div><div id="health-track" class="health-track" role="progressbar" aria-label="Health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div id="health-fill" class="health-fill"></div></div></div><span>Inventory: <span id="inventory">Empty</span></span><span>Story flags: <span id="flags">None</span></span><span>Choices made: <span id="history-count">0</span></span></section><p id="save-status" class="save-status" hidden>Solo progress saves automatically in this browser. Restart clears your save.</p>
     <section id="scene" class="scene" aria-label="Current story scene" hidden>
-      <div class="scene-overlay"><p id="scene-label" class="scene-label">Chapter One</p><div class="story-panel"><h2 id="scene-title">Loading…</h2><p id="story-text" aria-live="polite">Preparing your adventure.</p><div id="choices" class="choices"></div><p id="error" role="alert" class="error" hidden></p></div></div>
+      <div class="scene-overlay"><img id="character-portrait" class="character-portrait" alt="" hidden /><p id="scene-label" class="scene-label">Chapter One</p><div class="story-panel"><h2 id="scene-title">Loading…</h2><p id="story-text" aria-live="polite">Preparing your adventure.</p><div id="choices" class="choices"></div><p id="error" role="alert" class="error" hidden></p></div></div>
     </section>
     <footer>Every choice changes your path.</footer>
   </main>

@@ -5,6 +5,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import { randomInt } from 'node:crypto';
+import { initialState, transition, availableChoices } from './js/state.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -14,7 +15,7 @@ const rooms = new Map();
 const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const code = () => Array.from({length: 5}, () => alphabet[randomInt(alphabet.length)]).join('');
 const safeName = value => typeof value === 'string' ? value.trim().slice(0, 24) : '';
-const roomView = room => ({code: room.code, sceneId: room.sceneId, scene: story[room.sceneId], hostId: room.hostId, players: [...room.players].map(([id, p]) => ({id, name:p.name, voted:room.votes.has(id), choiceIndex:room.votes.get(id) ?? null})), votes: room.votes.size, tallies: (story[room.sceneId].choices || []).map((_, i) => [...room.votes.values()].filter(v => v === i).length)});
+const roomView = room => ({state:room.state, available:availableChoices(story[room.sceneId],room.state), code: room.code, sceneId: room.sceneId, scene: story[room.sceneId], hostId: room.hostId, players: [...room.players].map(([id, p]) => ({id, name:p.name, voted:room.votes.has(id), choiceIndex:room.votes.get(id) ?? null})), votes: room.votes.size, tallies: (story[room.sceneId].choices || []).map((_, i) => [...room.votes.values()].filter(v => v === i).length)});
 const publish = room => io.to(room.code).emit('room:update', roomView(room));
 const failure = (ack, message) => { if (typeof ack === 'function') ack({ok:false, error:message}); };
 function leave(socket) {
@@ -37,7 +38,7 @@ io.on('connection', socket => {
     if (rooms.size >= 500) return failure(ack, 'Server is at room capacity.');
     let roomCode;
     do {roomCode = code();} while (rooms.has(roomCode));
-    const room = {code:roomCode, sceneId:'start', hostId:socket.id, players:new Map([[socket.id, {name:safeName(name)}]]), votes:new Map()};
+    const room = {code:roomCode, sceneId:'start', hostId:socket.id, players:new Map([[socket.id, {name:safeName(name)}]]), votes:new Map(),state:initialState()};
     rooms.set(roomCode, room);
     socket.join(roomCode);
     socket.data.roomCode = roomCode;
@@ -67,7 +68,8 @@ io.on('connection', socket => {
     const room = rooms.get(socket.data.roomCode);
     if (!room || !room.players.has(socket.id)) return failure(ack, 'Join a room first.');
     const choices = story[room.sceneId].choices || [];
-    if (!Number.isInteger(index) || index < 0 || index >= choices.length) return failure(ack, 'Invalid choice.');
+    const available = availableChoices(story[room.sceneId], room.state).map(x => x.index);
+    if (!Number.isInteger(index) || !available.includes(index)) return failure(ack, 'Invalid choice.');
     if (room.hostId === socket.id) return failure(ack, 'The host selects the final choice instead of voting.');
     room.votes.set(socket.id, index);
     ack?.({ok:true});
@@ -77,10 +79,13 @@ io.on('connection', socket => {
     const room = rooms.get(socket.data.roomCode);
     if (!room || room.hostId !== socket.id) return failure(ack, 'Only the room host can decide.');
     const choices = story[room.sceneId].choices || [];
-    if (!Number.isInteger(index) || index < 0 || index >= choices.length) return failure(ack, 'Invalid choice.');
+    const available = availableChoices(story[room.sceneId], room.state).map(x => x.index);
+    if (!Number.isInteger(index) || !available.includes(index)) return failure(ack, 'Invalid choice.');
     const choice = choices[index];
     if (!story[choice.next]) return failure(ack, 'The next scene is missing.');
-    room.sceneId = choice.next;
+    const next = transition(story,room.sceneId,room.state,index);
+    room.sceneId = next.sceneId;
+    room.state = next.state;
     room.votes.clear();
     ack?.({ok:true});
     io.to(room.code).emit('room:result', {choice:choice.text});
@@ -90,6 +95,7 @@ io.on('connection', socket => {
     const room = rooms.get(socket.data.roomCode);
     if (!room || room.hostId !== socket.id) return failure(ack, 'Only the room host can restart.');
     room.sceneId = 'start';
+    room.state = initialState();
     room.votes.clear();
     ack?.({ok:true});
     publish(room);
@@ -97,6 +103,7 @@ io.on('connection', socket => {
   socket.on('room:leave', (_, ack) => {leave(socket); ack?.({ok:true});});
   socket.on('disconnect', () => leave(socket));
 });
+app.get('/health', (_req, res) => res.json({ok:true,service:'whispers-in-the-woods'}));
 app.use(express.static(dirname(fileURLToPath(import.meta.url)), {index:'index.html', dotfiles:'deny'}));
 const port = Number(process.env.PORT) || 3000;
 httpServer.listen(port, '0.0.0.0', () => console.log(`CYOA running at http://localhost:${port}`));
