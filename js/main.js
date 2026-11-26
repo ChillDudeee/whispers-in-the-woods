@@ -30,6 +30,7 @@ function displayMode(mode) {
   $('#scene').hidden = mode === 'lobby';
   $('#multiplayer-bar').hidden = mode !== 'multi';
   $('#vote-panel').hidden = mode !== 'multi';
+  $('#multi-save-tools').hidden = mode !== 'multi' || currentRoom?.hostId !== myId;
   $('#save-status').hidden = mode !== 'solo';
   $('#solo-save-tools').hidden = mode !== 'solo';
   $('#restart').hidden = mode === 'lobby' || (mode === 'multi' && currentRoom?.hostId !== myId);
@@ -69,6 +70,8 @@ function connect() {
       list.appendChild(item);
     }
     const isHost = room.hostId === myId;
+    $('#multi-save-tools').hidden = !isHost;
+    $('#multi-save-message').textContent = '';
     const transfer=$('#host-transfer'),transferButton=$('#transfer-host');
     transfer.hidden=!isHost;
     transferButton.hidden=!isHost;
@@ -220,6 +223,33 @@ async function init() {
         drawSolo();message.textContent='Save imported successfully.';
       } catch(error) {message.textContent=`Import failed: ${error.message}`;}
       finally {event.target.value='';}
+    });
+    $('#export-multi').addEventListener('click', async () => {
+      const message=$('#multi-save-message');
+      try {
+        const reply=await send('room:export',null);
+        const payload=JSON.stringify(reply.save,null,2);
+        const url=URL.createObjectURL(new Blob([payload],{type:'application/json'}));
+        const link=document.createElement('a');
+        link.href=url;
+        link.download=`whispers-multiplayer-${currentRoom.code}.json`;
+        document.body.append(link);link.click();link.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),1000);
+        message.textContent='Backup exported. Keep the file somewhere safe.';
+      } catch(error){message.textContent=`Export failed: ${error.message}`;}
+    });
+    $('#import-multi').addEventListener('change', async event => {
+      const file=event.target.files?.[0];
+      if(!file)return;
+      const message=$('#multi-save-message');
+      try {
+        if(file.size>1024*1024)throw new Error('Save exceeds 1 MB.');
+        const data=JSON.parse(await file.text());
+        if(!window.confirm("Restore this backup? This replaces the current room's story progress and clears votes."))return;
+        await send('room:import',data);
+        message.textContent='Multiplayer progress restored! Everyone sees the imported scene.';
+      }catch(error){message.textContent=`Import failed: ${error.message}`;}
+      finally{event.target.value='';}
     });
     $('#transfer-host').addEventListener('click',()=>send('room:transfer',$('#host-transfer').value).catch(error=>showError(error.message)));
     $('#resume-room').addEventListener('click',resumeSavedRoom);

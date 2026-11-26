@@ -50,3 +50,8 @@
 
 .host-controls {display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:.6rem 0}
 .host-controls select {background:#172a2b;color:#fff;border:1px solid #82999a;border-radius:.4rem;padding:.45rem;max-width:100%}
+
+/* Phase 5.1: portable multiplayer room backups */
+.save-tools-copy{flex:1 1 100%;font:14px/1.45 system-ui,sans-serif}
+.save-tools-copy p{margin:.3rem 0;color:#cbd9cd}
+#multi-save-message{flex:1 1 100%;font:14px system-ui,sans-serif;color:#e9dcae}

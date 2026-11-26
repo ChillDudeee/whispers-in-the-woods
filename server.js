@@ -7,6 +7,7 @@ import { dirname } from 'node:path';
 import { randomInt } from 'node:crypto';
 import { initialState, transition, availableChoices } from './js/state.js';
 import { openStore, newToken, validToken } from './room-store.js';
+import { exportAdventure, validateAdventure } from './multiplayer-save.js';
 
 const app=express(), httpServer=createServer(app),io=new Server(httpServer);
 const story=JSON.parse(await readFile(new URL('./story/chapter1.json',import.meta.url),'utf8'));
@@ -69,13 +70,31 @@ io.on('connection',socket=>{
   const next=transition(story,room.sceneId,room.state,index);room.sceneId=next.sceneId;room.state=next.state;room.votes.clear();
   await save(room);io.to(room.code).emit('room:result',{choice:choices[index].text});ack?.({ok:true});
  });
+ handle(socket,'room:export',async(_,ack)=>{
+  const room=playerOf(socket);
+  if(!room || room.hostId!==socket.data.playerId)return failure(ack,'Only the host can export a multiplayer save.');
+  ack?.({ok:true,save:exportAdventure(room)});
+ });
+ handle(socket,'room:import',async(data,ack)=>{
+  const room=playerOf(socket);
+  if(!room || room.hostId!==socket.data.playerId)return failure(ack,'Only the host can import a multiplayer save.');
+  if(!data || JSON.stringify(data).length>1024*1024)return failure(ack,'Save file is too large or missing.');
+  const loaded=validateAdventure(data,story);
+  // Validation completes before modifying the room. Keep the current room
+  // code and players; reset votes because the imported scene is a new round.
+  room.sceneId=loaded.sceneId;
+  room.state=loaded.state;
+  room.votes.clear();
+  await save(room);
+  ack?.({ok:true});
+ });
  handle(socket,'room:restart',async(_,ack)=>{const room=playerOf(socket);if(!room||room.hostId!==socket.data.playerId)return failure(ack,'Only the host can restart.');room.sceneId='start';room.state=initialState();room.votes.clear();await save(room);ack?.({ok:true});});
  handle(socket,'room:transfer',async(target,ack)=>{const room=playerOf(socket);if(!room||room.hostId!==socket.data.playerId)return failure(ack,'Only the host can transfer ownership.');if(!room.players.has(target)||target===room.hostId)return failure(ack,'Choose another player.');room.hostId=target;await save(room);ack?.({ok:true});});
  handle(socket,'room:leave',async(_,ack)=>{await leave(socket,true);ack?.({ok:true});});
  socket.on('disconnect',()=>{leave(socket).catch(console.error);});
 });
 app.get('/health',(_req,res)=>res.json({ok:true,service:'whispers-in-the-woods',persistent:store.persistent}));
-app.use((req,res,next)=>{if(/^\/(?:server\.js|room-store\.js|package(?:-lock)?\.json|README\.md|test(?:\/|$))/i.test(req.path))return res.sendStatus(404);next();});
+app.use((req,res,next)=>{if(/^\/(?:server\.js|room-store\.js|multiplayer-save\.js|package(?:-lock)?\.json|README\.md|test(?:\/|$))/i.test(req.path))return res.sendStatus(404);next();});
 app.use(express.static(dirname(fileURLToPath(import.meta.url)),{index:'index.html',dotfiles:'deny'}));
 const port=Number(process.env.PORT)||3000;
 httpServer.listen(port,'0.0.0.0',()=>console.log(`CYOA running at http://localhost:${port}`));

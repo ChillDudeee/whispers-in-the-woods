@@ -47,3 +47,17 @@ Health now appears as a 0-100 progress bar (green, amber at 50 or below, red at 
 - Room data includes names, player tokens, votes, and game progress. Treat the database URL as a secret and never commit it to GitHub. Possession of a player's browser token grants control of that player, so do not share browser storage or tokens.
 - Rooms persist until all members explicitly leave. Offline members still occupy room slots; an administrator may need to remove abandoned rooms from the database. This version assumes **one running server instance**; do not scale Render to multiple instances without shared Socket.IO coordination and synchronized room updates.
 - Install dependencies using `npm install` and run `npm test`, then `npm start`. Render build command: `npm install`; start command: `npm start`.
+
+## Phase 5.1 — Multiplayer backups without PostgreSQL
+
+No database is required. In a multiplayer room, the **host** sees **Export multiplayer save** and **Import multiplayer save**. Export downloads a JSON file with scene, health, inventory, story flags and choice history. The save does **not** contain room codes, player names, votes, or private session tokens.
+
+**Restore after Render sleeps or restarts:**
+1. Before ending an adventure, the host clicks **Export multiplayer save** and keeps the downloaded `.json` file. Export again after major decisions; backups are manual, not automatic.
+2. After the server restarts, the host creates a **new multiplayer room**.
+3. In the new room, the host uses **Import multiplayer save** and selects the saved JSON. Confirm that current room progress should be overwritten.
+4. The room is now at the restored scene with the saved health, inventory, flags and history. Votes are reset; give friends the **new room code** so they can join.
+
+Import is server-validated against the bundled story. Backups from a different/modified story that no longer matches may be rejected. Keep a copy before uploading new story chapters. Only the current host may export or import, and importing does not make the old room code valid again. This feature preserves all Phase 5 functions; PostgreSQL remains optional if you want automatic persistence.
+
+Run `npm install`, `npm test`, `npm start`. On Render: commit everything in `CYOA-Game/` (including `multiplayer-save.js`) at the repository root. Build `npm install`, start `npm start`. Keep `node_modules`, secrets, and `.env` out of GitHub.
